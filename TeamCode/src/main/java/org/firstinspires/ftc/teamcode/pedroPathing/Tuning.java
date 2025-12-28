@@ -64,7 +64,7 @@ public class Tuning extends SelectableOpMode {
             s.folder("Manual", p -> {
                 p.add("Translational Tuner", TranslationalTuner::new);
                 p.add("Heading Tuner", HeadingTuner::new);
-                p.add("Drive Tuner", DriveTuner::new);
+                p.add("Drive2 Tuner", DriveTuner::new);
                 p.add("Line Tuner", Line::new);
                 p.add("Centripetal Tuner", CentripetalTuner::new);
             });
@@ -867,7 +867,7 @@ class HeadingTuner extends OpMode {
 }
 
 /**
- * This is the Drive PIDF Tuner OpMode. It will run the robot in a straight line going forward and back.
+ * This is the Drive2 PIDF Tuner OpMode. It will run the robot in a straight line going forward and back.
  *
  * @author Baron Henderson - 20077 The Indubitables
  * @author Anyi Lin - 10158 Scott's Bots
