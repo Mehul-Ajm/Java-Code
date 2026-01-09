@@ -18,11 +18,11 @@ public class Intake {
         this.telemetry = telemetry;
     }
 
-    public void update(){
-        if(gamepad1.right_trigger>0.01){
+    public void update(double r, double l){
+        if(r>0.01){
             intakeSubsystem.moveIntakeForward();
         }
-        else if (gamepad1.left_trigger>0.01){
+        else if (l>0.01){
             intakeSubsystem.moveIntakeBackward();
         }
         else{

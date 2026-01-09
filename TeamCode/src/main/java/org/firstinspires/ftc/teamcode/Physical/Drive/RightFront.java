@@ -17,7 +17,7 @@ public class RightFront {
     public void rightFrontPower(double y, double x, double rx){
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1.0);
         double power = (y - x - rx) / denominator;
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setPower(power);
         telemetry.addData("Right Front Power: ",power);

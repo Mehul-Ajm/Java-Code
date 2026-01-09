@@ -19,10 +19,9 @@ public class DuckTeleOpBlue extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            drivetrain.update();
-            intake.update();
-            shooter.update(false);
-
+            drivetrain.update(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+            intake.update(gamepad1.right_trigger, gamepad1.left_trigger);
+            shooter.update(gamepad1.right_bumper, gamepad1.left_bumper,false);
 
 
             //Telemetry Update

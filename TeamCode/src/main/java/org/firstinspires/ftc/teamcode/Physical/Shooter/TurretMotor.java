@@ -8,7 +8,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class TurretMotor {
     DcMotor turretMotor;
     Telemetry telemetry;
-    double power = 1;
 
     public TurretMotor(Telemetry telemetry, HardwareMap hardwareMap){
         turretMotor = hardwareMap.get(DcMotor.class, "turret");
@@ -16,11 +15,11 @@ public class TurretMotor {
         this.telemetry = telemetry;
     }
 
-    public void moveMotorRight(){
+    public void moveMotorRight(double power){
         turretMotor.setPower(power);
     }
 
-    public void moveMotorLeft(){
+    public void moveMotorLeft(double power){
         turretMotor.setPower(-power);
     }
 

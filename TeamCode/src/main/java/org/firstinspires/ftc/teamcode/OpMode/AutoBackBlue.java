@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode.OpMode; // make sure this aligns with class location
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
@@ -15,25 +16,37 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 public class AutoBackBlue extends OpMode {
 
     private Follower follower;
-    private Timer pathTimer, actionTimer, opmodeTimer;
+    private Timer pathTimer, opmodeTimer;
 
     private int pathState;
-    private final Pose startPose = new Pose(28.5, 128, Math.toRadians(180)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(60, 85, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+
+    private final Pose startPose = new Pose(63, 8, Math.toRadians(90)); // Start Pose of our robot.
+    private final Pose scorePoseBack = new Pose(60, 12, Math.toRadians(111.801409486)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose pickup1Pose = new Pose(12, 36); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose controlP1 = new Pose(60,40);
 
     private Path scorePreload;
-    private DcMotor shooterMotor;
-
+    private PathChain grabPickup1, scorePickup1;
 
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
-        scorePreload = new Path(new BezierLine(startPose, scorePose));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+        scorePreload = new Path(new BezierLine(startPose, scorePoseBack));
+        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePoseBack.getHeading());
 
     /* Here is an example for Constant Interpolation
     scorePreload.setConstantInterpolation(startPose.getHeading()); */
 
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
+        grabPickup1 = follower.pathBuilder()
+                .addPath(new BezierCurve(scorePoseBack, controlP1,pickup1Pose))
+                .setTangentHeadingInterpolation()
+                .build();
+
+        /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
+        scorePickup1 = follower.pathBuilder()
+                .addPath(new BezierLine(pickup1Pose, scorePoseBack))
+                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePoseBack.getHeading())
+                .build();
     }
 
     public void autonomousPathUpdate() {
@@ -43,21 +56,48 @@ public class AutoBackBlue extends OpMode {
                 setPathState(1);
                 break;
             case 1:
-                shooterMotor.setPower(1);
+
+            /* You could check for
+            - Follower State: "if(!follower.isBusy()) {}"
+            - Time: "if(pathTimer.getElapsedTimeSeconds() > 1) {}"
+            - Robot Position: "if(follower.getPose().getX() > 36) {}"
+            */
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
+                    /* Score Preload */
+
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                    follower.followPath(grabPickup1,true);
+                    setPathState(2);
+                }
+                break;
+            case 2:
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
+                if(!follower.isBusy()) {
+                    /* Grab Sample */
+
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+                    follower.followPath(scorePickup1,true);
+                    setPathState(3);
+                }
+                break;
+            case 3:
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    /* Set the state to a Case we won't use or define, so it just stops running an new paths */
+                    setPathState(-1);
+                }
+                break;
         }
     }
 
-    /**
-     * These change the states of the paths and actions. It will also reset the timers of the individual switches
-     **/
+    /** These change the states of the paths and actions. It will also reset the timers of the individual switches **/
     public void setPathState(int pState) {
         pathState = pState;
         pathTimer.resetTimer();
     }
-
-    /**
-     * This is the main loop of the OpMode, it will run repeatedly after clicking "Play".
-     **/
+    /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
     @Override
     public void loop() {
 
@@ -73,9 +113,7 @@ public class AutoBackBlue extends OpMode {
         telemetry.update();
     }
 
-    /**
-     * This method is called once at the init of the OpMode.
-     **/
+    /** This method is called once at the init of the OpMode. **/
     @Override
     public void init() {
         pathTimer = new Timer();
@@ -89,27 +127,19 @@ public class AutoBackBlue extends OpMode {
 
     }
 
-    /**
-     * This method is called continuously after Init while waiting for "play".
-     **/
+    /** This method is called continuously after Init while waiting for "play". **/
     @Override
-    public void init_loop() {
-    }
+    public void init_loop() {}
 
-    /**
-     * This method is called once at the start of the OpMode.
-     * It runs all the setup actions, including building paths and starting the path system
-     **/
+    /** This method is called once at the start of the OpMode.
+     * It runs all the setup actions, including building paths and starting the path system **/
     @Override
     public void start() {
         opmodeTimer.resetTimer();
         setPathState(0);
     }
 
-    /**
-     * We do not use this because everything should automatically disable
-     **/
+    /** We do not use this because everything should automatically disable **/
     @Override
-    public void stop() {
-    }
+    public void stop() {}
 }

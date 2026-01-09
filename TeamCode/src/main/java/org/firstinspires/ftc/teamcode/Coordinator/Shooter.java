@@ -24,11 +24,11 @@ public class Shooter {
         this.telemetry = telemetry;
     }
 
-    public void update(boolean isRed){
-        if(gamepad1.right_bumper){
+    public void update(boolean r, boolean l, boolean isRed){
+        if(r){
             shooterSubsystem.shoot(isRed);
         }
-        if(gamepad1.left_bumper){
+        if(l){
             shooterSubsystem.humanPlayer();
         }
         else{

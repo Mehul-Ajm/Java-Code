@@ -16,11 +16,7 @@ public class Drivetrain {
         this.gamepad1 = gamepad1;
     }
 
-    public void update(){
-        double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
-
+    public void update(double y, double x, double rx){
         driveSubsystem.moveDrive(y, x, rx);
     }
 
