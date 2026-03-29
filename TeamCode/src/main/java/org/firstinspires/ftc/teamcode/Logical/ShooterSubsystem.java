@@ -1,48 +1,78 @@
 package org.firstinspires.ftc.teamcode.Logical;
 
-import com.qualcomm.robotcore.hardware.DcMotorImplEx;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Physical.Shared.Pinpoint;
-import org.firstinspires.ftc.teamcode.Physical.Shooter.MotorController;
+import org.firstinspires.ftc.teamcode.Physical.Shooter.ShooterMotor;
+
+import java.util.logging.Handler;
 
 public class ShooterSubsystem {
-    DcMotorImplEx shooterMotor;
-    Servo angle;
-    MotorController motorController;
+    ShooterMotor shooterMotor;
     Telemetry telemetry;
-    Pinpoint odo;
-
-    public ShooterSubsystem(Telemetry telemetry, HardwareMap hardwareMap){
-        shooterMotor = hardwareMap.get(DcMotorImplEx.class, "shooter");
-        motorController = new MotorController(shooterMotor);
-        odo = new Pinpoint(telemetry, hardwareMap);
+    Follower follower;
+    public ShooterSubsystem(Telemetry telemetry, HardwareMap hardwareMap) {
+        shooterMotor = new ShooterMotor(telemetry, hardwareMap);
 
         this.telemetry = telemetry;
     }
 
-    public void shoot(boolean isRed){
-        double distanceToGoal = ShooterCalc.distance(odo.getX(),odo.getY(),isRed);
-        double v0 = ShooterCalc.v0(distanceToGoal);
-        double angleDeg = ShooterCalc.angle(distanceToGoal);
-        angle.setPosition(ShooterCalc.angleToServo(angleDeg));
-        motorController.setRPM(ShooterCalc.velocityToRPM(v0));
+    public void stopShoot(){
+        shooterMotor.setRPM(0);
     }
 
-    public void humanPlayer(){
-        motorController.max(true);
+    public void setRPM(double RPM){
+        shooterMotor.setRPM(RPM);
     }
 
-    public void stopMotor(){
-        motorController.stop();
+    public void shootBall(double distance){
+        shooterMotor.setRPM(calculateRPM(distance));
     }
 
-    public void moveTurret(boolean isLeft){
-        double targetHeading = 0;
-        if(isLeft){
-            targetHeading = 15;
-        }
+    public void closeShoot(){
+        shooterMotor.setRPM(2700);
+    }
+
+    public void farShoot(){
+        shooterMotor.setRPM(3000);
+    }
+
+    private double calculateRPM(double distance){
+        double x = 8.16267;
+        double y = 1960.69412;
+        return x*distance + y;
+    }
+
+    public void addRPM(double addRPM){
+        shooterMotor.setRPM(shooterMotor.getRPM() + addRPM);
+    }
+
+    public void subRPM(double subRPM){
+        shooterMotor.setRPM(shooterMotor.getRPM() - subRPM);
+    }
+
+    public double getRPM(){
+        return shooterMotor.getRPM();
+    }
+
+    public void addP(double p){
+        shooterMotor.addP(p);
+    }
+
+    public void subP(double p){
+        shooterMotor.subP(p);
+    }
+
+    public void addF(double f){
+        shooterMotor.addF(f);
+    }
+
+    public void subF(double f){
+        shooterMotor.subF(f);
+    }
+
+    public void getPIDF(){
+        shooterMotor.getPIDF();
     }
 }

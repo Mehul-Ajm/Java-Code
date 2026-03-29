@@ -12,11 +12,10 @@ import org.firstinspires.ftc.teamcode.Coordinator.Drivetrain;
 import org.firstinspires.ftc.teamcode.Coordinator.Intake;
 import org.firstinspires.ftc.teamcode.Coordinator.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-
-@TeleOp(name = "TeleOp Blue")
-public class DuckTeleOpBlue extends OpMode {
+@TeleOp(name = "PID Turret Test")
+public class TurretTest extends OpMode {
     private final Pose startPose = new Pose(72, 72, Math.toRadians(90)); // Start Pose of our robot.
-    private final Pose cornerPose = new Pose(138,9, Math.toRadians(90));
+    private final Pose cornerPose = new Pose(6,9, Math.toRadians(90));
     DcMotorImplEx motorEx;
     //    MotorPhys motor;
     double kP = 0.09 ;  //
@@ -26,7 +25,7 @@ public class DuckTeleOpBlue extends OpMode {
     double kD = 0.0018;
     double kF = 0.000;
 
-    double manaulOffSet;
+    double manualOffSet;
 
     PIDFController turretPID = new PIDFController(new PIDFCoefficients(kP, kI, kD, kF));
 
@@ -37,7 +36,7 @@ public class DuckTeleOpBlue extends OpMode {
     boolean lastRT = false;
     boolean lastLT = false;
 
-    boolean red = false;
+    boolean red = true;
     double difference;
 
     double headingDisplacement;
@@ -105,7 +104,12 @@ public class DuckTeleOpBlue extends OpMode {
 
         headingDisplacement = 0 - Math.toDegrees(follower.getHeading()); //0 is turret starting displacement
 
-        difference = bluetargetAngle + headingDisplacement;
+        if(red){
+            difference = redtargetAngle + headingDisplacement;
+        }else{
+            difference = bluetargetAngle + headingDisplacement;
+        }
+
 
         if (difference > 180){
             direction = -360;
@@ -119,33 +123,46 @@ public class DuckTeleOpBlue extends OpMode {
         targetRed = degreesToTicks(direction + (redtargetAngle + headingDisplacement));
 
 
-        if(red && !gamepad1.b){
-            turretPID.setTargetPosition(targetRed + manaulOffSet);
-        } else if (!red && !gamepad1.b) {
-            turretPID.setTargetPosition(targetBlue + manaulOffSet);
+        if(gamepad1.a){
+            red = false;
+            //motorEx.setTargetPosition(degreesToTicks(direction + (bluetargetAngle + headingDisplacement)));
+        }
+        else if(gamepad1.y){
+            red = true;
+            //motorEx.setTargetPosition(degreesToTicks(direction + (redtargetAngle + headingDisplacement)));
+        }
+        else if (gamepad1.b){
+            //motorEx.setTargetPosition(0);
+            turretPID.setTargetPosition(0);
         }
 
-        if (gamepad1.dpad_right) {
-//            turretPID.setTargetPosition(turretPID.getTargetPosition() + degreesToTicks(2));
-            manaulOffSet +=4;
+        if(red && !gamepad1.b){
+            turretPID.setTargetPosition(targetRed + manualOffSet);
+        } else if (!red && !gamepad1.b) {
+            turretPID.setTargetPosition(targetBlue + manualOffSet);
         }
-        if (gamepad1.dpad_left) {
+
+        if (gamepad1.dpad_right || gamepad2.dpad_right) {
+//            turretPID.setTargetPosition(turretPID.getTargetPosition() + degreesToTicks(2));
+            manualOffSet +=4;
+        }
+        if (gamepad1.dpad_left || gamepad2.dpad_left) {
 //            turretPID.setTargetPosition(turretPID.getTargetPosition() - degreesToTicks(2));
-            manaulOffSet -=4;
+            manualOffSet -=4;
         }
         if(gamepad1.xWasPressed()){
             follower.setPose(cornerPose);
         }
 
         if(gamepad2.right_bumper){
-            manaulOffSet += 10;
+            manualOffSet += 10;
         }
         if(gamepad2.left_bumper){
-            manaulOffSet -= 10;
+            manualOffSet -= 10;
         }
-        if(gamepad2.a){
-
-        }
+//        if(gamepad2.a){
+//
+//        }
 
 // ----- kD -----
         if (gamepad2.dpadUpWasPressed()) {
@@ -196,7 +213,7 @@ public class DuckTeleOpBlue extends OpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("Difference", difference);
-        telemetry.addData("Manual Offset", manaulOffSet);
+        telemetry.addData("Manual Offset", manualOffSet);
         telemetry.update();
     }
 

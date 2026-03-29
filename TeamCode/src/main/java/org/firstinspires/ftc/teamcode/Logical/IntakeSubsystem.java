@@ -15,15 +15,15 @@ public class IntakeSubsystem {
         this.telemetry = telemetry;
     }
 
-    public void moveIntakeForward(){
-        intakeMotor.moveMotorForward();
+    public void moveIntakeForward(double power){
+        intakeMotor.moveMotorForward(power);
     }
 
-    public void moveIntakeBackward(){
-        intakeMotor.moveMotorBackward();
+    public void moveIntakeBackward(double power){
+        intakeMotor.moveMotorBackward(power);
     }
 
     public void stopIntake(){
-        intakeMotor.stopMotor();
+        intakeMotor.stopMotor(0);
     }
 }

@@ -6,9 +6,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class IntakeMotor {
-    DcMotor intakeMotor;
-    Telemetry telemetry;
-    double power = 1.0;
+    public DcMotor intakeMotor;
+    public Telemetry telemetry;
 
     public IntakeMotor(Telemetry telemetry, HardwareMap hardwareMap){
         intakeMotor = hardwareMap.get(DcMotor.class, "intake");
@@ -16,15 +15,15 @@ public class IntakeMotor {
         this.telemetry = telemetry;
     }
 
-    public void moveMotorForward(){
+    public void moveMotorForward(double power){
         intakeMotor.setPower(power);
     }
 
-    public void moveMotorBackward(){
+    public void moveMotorBackward(double power){
         intakeMotor.setPower(-power);
     }
 
-    public void stopMotor(){
+    public void stopMotor(double power){
         intakeMotor.setPower(0);
     }
 }

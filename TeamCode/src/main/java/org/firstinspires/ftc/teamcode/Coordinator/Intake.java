@@ -20,10 +20,10 @@ public class Intake {
 
     public void update(double r, double l){
         if(r>0.01){
-            intakeSubsystem.moveIntakeForward();
+            intakeSubsystem.moveIntakeForward(r);
         }
         else if (l>0.01){
-            intakeSubsystem.moveIntakeBackward();
+            intakeSubsystem.moveIntakeBackward(l);
         }
         else{
             intakeSubsystem.stopIntake();
