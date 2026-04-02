@@ -9,7 +9,7 @@ public class varshilShooter {
     ShooterMotor shooterMotor;
     Telemetry telemetry;
     public varshilShooter(HardwareMap hardwareMap, Telemetry telemetry){
-        shooterMotor = hardwareMap.get(ShooterMotor.class, "shooter");
+        shooterMotor = new ShooterMotor(telemetry, hardwareMap);
         this.telemetry = telemetry;
     }
 

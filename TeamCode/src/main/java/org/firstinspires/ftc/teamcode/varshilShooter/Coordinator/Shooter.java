@@ -32,6 +32,8 @@ public class Shooter {
         else if(b){
             shooter.farShoot();
         }
+
+        telemetry.addData("RPM: ", shooter.getRPM());
     }
 
     public void addRPM(double addRPM){
