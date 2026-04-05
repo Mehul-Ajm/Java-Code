@@ -2,29 +2,74 @@ package org.firstinspires.ftc.teamcode.OpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Coordinator.Drivetrain;
 import org.firstinspires.ftc.teamcode.Coordinator.Intake;
 import org.firstinspires.ftc.teamcode.varshilShooter.Coordinator.Shooter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 @TeleOp(name = "varshilShooter")
 public class TeleOPVarshil extends OpMode {
     Drivetrain drivetrain;
     Intake intake;
     Shooter shooter;
+    FileWriter writer;
+    boolean loggingEnabled = false;
 
     @Override
     public void init() {
         drivetrain = new Drivetrain(telemetry, hardwareMap, gamepad1);
         intake = new Intake(telemetry, hardwareMap, gamepad1);
         shooter = new Shooter(hardwareMap, telemetry);
+
+        try {
+            writer = new FileWriter("/sdcard/FIRST/telemetry_data.csv");
+            writer.append("Time,ShooterRPM,DriveY,DriveX,DriveTurn,A,B,X,Y,DUp,DDown,DLeft,DRight,LB,RB\n");
+            loggingEnabled = true;
+        } catch (IOException e) {
+            telemetry.addData("Log Error", e.getMessage());
+        }
     }
 
     @Override
     public void loop() {
         drivetrain.update(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
         intake.update(gamepad1.right_trigger, gamepad1.left_trigger);
-        shooter.update(gamepad1.right_bumper, gamepad1.left_bumper,gamepad1.yWasPressed(),gamepad1.xWasPressed(),gamepad1.bWasPressed(),gamepad1.aWasPressed());
+        shooter.update(gamepad1.right_bumper, gamepad1.left_bumper, gamepad1.yWasPressed(), gamepad1.xWasPressed(), gamepad1.bWasPressed(), gamepad1.aWasPressed());
+
+        if (loggingEnabled) {
+            try {
+                writer.append(String.valueOf(getRuntime())).append(",")
+                        .append(String.valueOf(shooter.getRPM())).append(",")
+                        .append(String.valueOf(-gamepad1.left_stick_y)).append(",")
+                        .append(String.valueOf(gamepad1.left_stick_x)).append(",")
+                        .append(String.valueOf(gamepad1.right_stick_x)).append(",")
+                        .append(String.valueOf(gamepad1.a)).append(",")
+                        .append(String.valueOf(gamepad1.b)).append(",")
+                        .append(String.valueOf(gamepad1.x)).append(",")
+                        .append(String.valueOf(gamepad1.y)).append(",")
+                        .append(String.valueOf(gamepad1.dpad_up)).append(",")
+                        .append(String.valueOf(gamepad1.dpad_down)).append(",")
+                        .append(String.valueOf(gamepad1.dpad_left)).append(",")
+                        .append(String.valueOf(gamepad1.dpad_right)).append(",")
+                        .append(String.valueOf(gamepad1.left_bumper)).append(",")
+                        .append(String.valueOf(gamepad1.right_bumper)).append("\n");
+                writer.flush();
+            } catch (IOException e) {
+                telemetry.addData("Log Error", e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        if (loggingEnabled) {
+            try {
+                writer.close();
+            } catch (IOException e) {
+                telemetry.addData("Log Error", e.getMessage());
+            }
+        }
     }
 }

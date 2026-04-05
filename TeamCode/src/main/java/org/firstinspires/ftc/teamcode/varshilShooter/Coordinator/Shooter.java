@@ -55,4 +55,8 @@ public class Shooter {
     public void farShoot(){
         shooter.farShoot();
     }
+
+    public double getRPM(){
+        return shooter.getRPM();
+    }
 }
